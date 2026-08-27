@@ -1,0 +1,271 @@
+name: Build & Preview Game
+
+on:
+  workflow_dispatch:
+    inputs:
+      game_id:
+        description: 'Game ID'
+        required: true
+      game_name:
+        description: 'Game Name'
+        required: true
+      user_email:
+        description: 'User email for notifications'
+        required: false
+      android_bundle_id:
+        description: 'Android bundle ID (e.g. com.mycompany.mygame)'
+        required: false
+      ios_bundle_id:
+        description: 'iOS bundle ID (e.g. com.mycompany.mygame)'
+        required: false
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    outputs:
+      public_key: ${{ steps.upload.outputs.public_key }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decode signing keystore
+        run: echo "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" | base64 -d > /tmp/release.jks
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.27.4
+          channel: stable
+
+      - name: Create Flutter project scaffold
+        run: |
+          set -e
+          ORG="com.7p2"
+          PROJ="android"
+          mv lib /tmp/_saved_lib
+          mv pubspec.yaml /tmp/_saved_pubspec
+          flutter create --org "$ORG" --project-name "$PROJ" _scaffold
+          rm -rf android ios web linux macos windows test
+          mv _scaffold/android .
+          mv _scaffold/ios .
+          mv _scaffold/web .
+          mv _scaffold/linux .
+          mv _scaffold/macos .
+          mv _scaffold/windows .
+          mv _scaffold/test .
+          mv _scaffold/.gitignore .
+          rm -rf _scaffold
+          mv /tmp/_saved_lib lib
+          mv /tmp/_saved_pubspec pubspec.yaml
+          ls -la lib/main.dart
+
+      - name: Configure Android signing
+        run: echo "aW1wb3J0IHJlCndpdGggb3BlbignYW5kcm9pZC9hcHAvYnVpbGQuZ3JhZGxlJykgYXMgZjogYyA9IGYucmVhZCgpCm5zID0gcmUuc2VhcmNoKHInbmFtZXNwYWNlXHMqPVxzKlwiKFteXCJdKylcIicsIGMpLmdyb3VwKDEpCmFpZCA9IHJlLnNlYXJjaChyJ2FwcGxpY2F0aW9uSWRccyo9XHMqXCIoW15cIl0rKVwiJywgYykuZ3JvdXAoMSkKQkxPQ0sgPSAiIiJwbHVnaW5zIHsKICAgIGlkICJjb20uYW5kcm9pZC5hcHBsaWNhdGlvbiIKICAgIGlkICJrb3RsaW4tYW5kcm9pZCIKICAgIGlkICJkZXYuZmx1dHRlci5mbHV0dGVyLWdyYWRsZS1wbHVnaW4iCn0KCmFuZHJvaWQgewogICAgc2lnbmluZ0NvbmZpZ3MgewogICAgICAgIHJlbGVhc2UgewogICAgICAgICAgICBrZXlBbGlhcyA9ICJLRVlfQUxJQVMiCiAgICAgICAgICAgIGtleVBhc3N3b3JkID0gIktFWV9QQVNTV09SRCIKICAgICAgICAgICAgc3RvcmVGaWxlID0gZmlsZSgiL3RtcC9yZWxlYXNlLmprcyIpCiAgICAgICAgICAgIHN0b3JlUGFzc3dvcmQgPSAiU1RPUkVfUEFTUyIKICAgICAgICB9CiAgICB9CiAgICBuYW1lc3BhY2UgPSAiTlNfUExBQ0VIT0xERVIiCiAgICBjb21waWxlU2RrID0gZmx1dHRlci5jb21waWxlU2RrVmVyc2lvbgogICAgbmRrVmVyc2lvbiA9IGZsdXR0ZXIubmRrVmVyc2lvbgoKICAgIGNvbXBpbGVPcHRpb25zIHsKICAgICAgICBzb3VyY2VDb21wYXRpYmlsaXR5ID0gSmF2YVZlcnNpb24uVkVSU0lPTl8xXzgKICAgICAgICB0YXJnZXRDb21wYXRpYmlsaXR5ID0gSmF2YVZlcnNpb24uVkVSU0lPTl8xXzgKICAgIH0KCiAgICBrb3RsaW5PcHRpb25zIHsKICAgICAgICBqdm1UYXJnZXQgPSBKYXZhVmVyc2lvbi5WRVJTSU9OXzFfOAogICAgfQoKICAgIGRlZmF1bHRDb25maWcgewogICAgICAgIGFwcGxpY2F0aW9uSWQgPSAiQVBQSURfUExBQ0VIT0xERVIiCiAgICAgICAgbWluU2RrID0gZmx1dHRlci5taW5TZGtWZXJzaW9uCiAgICAgICAgdGFyZ2V0U2RrID0gZmx1dHRlci50YXJnZXRTZGtWZXJzaW9uCiAgICAgICAgdmVyc2lvbkNvZGUgPSBmbHV0dGVyLnZlcnNpb25Db2RlCiAgICAgICAgdmVyc2lvbk5hbWUgPSBmbHV0dGVyLnZlcnNpb25OYW1lCiAgICB9CgogICAgYnVpbGRUeXBlcyB7CiAgICAgICAgcmVsZWFzZSB7CiAgICAgICAgICAgIHNpZ25pbmdDb25maWcgPSBzaWduaW5nQ29uZmlncy5yZWxlYXNlCiAgICAgICAgfQogICAgfQp9CgpmbHV0dGVyIHsKICAgIHNvdXJjZSA9ICIuLi8iCn0KIiIiCkJMT0NLID0gQkxPQ0sucmVwbGFjZSgnS0VZX0FMSUFTJywgJ3BsYXRmb3JtX3JlbGVhc2UnKQpCTE9DSyA9IEJMT0NLLnJlcGxhY2UoJ0tFWV9QQVNTV09SRCcsICdRdWl6TmluamEyMDI0IScpCkJMT0NLID0gQkxPQ0sucmVwbGFjZSgnU1RPUkVfUEFTUycsICdRdWl6TmluamEyMDI0IScpCkJMT0NLID0gQkxPQ0sucmVwbGFjZSgnTlNfUExBQ0VIT0xERVInLCBucykKQkxPQ0sgPSBCTE9DSy5yZXBsYWNlKCdBUFBJRF9QTEFDRUhPTERFUicsIGFpZCkKd2l0aCBvcGVuKCdhbmRyb2lkL2FwcC9idWlsZC5ncmFkbGUnLCAndycpIGFzIGY6IGYud3JpdGUoQkxPQ0spCnByaW50KCdTaWduaW5nIGNvbmZpZ3VyZWQnKQo=" | base64 -d > /tmp/configure_signing.py && python3 /tmp/configure_signing.py
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Android release APK
+        run: flutter build apk --release
+
+      - name: Build Android release AAB
+        run: flutter build appbundle --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      - name: Upload APK to Appetize.io
+        id: upload
+        env:
+          APPETIZE_TOKEN: ${{ secrets.APPETIZE_TOKEN }}
+        run: |
+          SHORT_ID="${{ github.event.inputs.game_id }}"
+          SHORT_ID="${SHORT_ID%%-*}"
+          SHORT_ID="${SHORT_ID:0:20}"
+          RESPONSE=$(curl -s -X POST \
+            -H "X-API-KEY: $APPETIZE_TOKEN" \
+            -F "file=@build/app/outputs/flutter-apk/app-release.apk" \
+            -F "platform=android" \
+            -F "tags[]=$SHORT_ID" \
+            https://api.appetize.io/v2/builds)
+          echo "Android response: $RESPONSE"
+          BUILD_ID=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))")
+          echo "public_key=$BUILD_ID" >> $GITHUB_OUTPUT
+
+  build-ios:
+    runs-on: macos-14
+    outputs:
+      public_key: ${{ steps.upload.outputs.public_key }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.27.4
+          channel: stable
+
+      - name: Create Flutter project scaffold
+        run: |
+          cp pubspec.yaml _pubspec_bak.yaml
+          cp -r lib _lib_bak
+          ORG="com.7p2"
+          PROJ="ios"
+          flutter create --org "$ORG" --project-name "$PROJ" _scaffold
+          rm -rf android ios web linux macos windows test
+          mv _scaffold/android .
+          mv _scaffold/ios .
+          mv _scaffold/web .
+          mv _scaffold/linux .
+          mv _scaffold/macos .
+          mv _scaffold/windows .
+          mv _scaffold/test .
+          mv _scaffold/.gitignore .
+          rm -rf _scaffold _pubspec_bak.yaml _lib_bak
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build iOS simulator
+        run: |
+          flutter build ios --debug --simulator
+          cd build/ios/iphonesimulator
+          zip -r app-simulator.zip Runner.app
+
+      - name: Upload iOS build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator
+          path: build/ios/iphonesimulator/app-simulator.zip
+          retention-days: 7
+
+      - name: Upload iOS build to Appetize.io
+        id: upload
+        env:
+          APPETIZE_TOKEN: ${{ secrets.APPETIZE_TOKEN }}
+        run: |
+          SHORT_ID="${{ github.event.inputs.game_id }}"
+          SHORT_ID="${SHORT_ID%%-*}"
+          SHORT_ID="${SHORT_ID:0:20}"
+          RESPONSE=$(curl -s -X POST \
+            -H "X-API-KEY: $APPETIZE_TOKEN" \
+            -F "file=@build/ios/iphonesimulator/app-simulator.zip" \
+            -F "platform=ios" \
+            -F "tags[]=$SHORT_ID" \
+            https://api.appetize.io/v2/builds)
+          echo "iOS response: $RESPONSE"
+          BUILD_ID=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))")
+          echo "public_key=$BUILD_ID" >> $GITHUB_OUTPUT
+
+  notify:
+    needs: [build-android, build-ios]
+    if: always() && needs.build-android.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write email script
+        run: |
+          cat > /tmp/send_email.py << "ENDSCRIPT"
+          import smtplib, os
+          from email.mime.text import MIMEText
+          from email.mime.multipart import MIMEMultipart
+          game_name = os.environ["GAME_NAME"]
+          user_email = os.environ["USER_EMAIL"]
+          android_url = os.environ["ANDROID_URL"]
+          ios_url = os.environ.get("IOS_URL", "")
+          android_artifact = os.environ.get("ANDROID_ARTIFACT_URL", "")
+          ios_artifact = os.environ.get("IOS_ARTIFACT_URL", "")
+          aab_artifact = os.environ.get("AAB_ARTIFACT_URL", "")
+          game_id = os.environ["GAME_ID"]
+          gmail_pass = os.environ["GMAIL_APP_PASSWORD"]
+          run_id = os.environ["RUN_ID"]
+          repo = os.environ["REPO"]
+          html = "<h2>Your game is ready!</h2>"
+          html += "<p><b>" + game_name + "</b> has been built and is ready to preview on Appetize.io.</p>"
+          html += "<h3>Live Preview</h3>"
+          html += "<p><b>Android:</b> <a href='" + android_url + "'>" + android_url + "</a></p>"
+          if ios_url:
+              html += "<p><b>iOS:</b> <a href='" + ios_url + "'>" + ios_url + "</a></p>"
+          html += "<h3>Download Builds</h3>"
+          if android_artifact:
+              html += "<p><b>Android APK:</b> <a href='" + android_artifact + "'>Download APK</a></p>"
+          if ios_artifact:
+              html += "<p><b>iOS Simulator:</b> <a href='" + ios_artifact + "'>Download iOS Build</a></p>"
+          if aab_artifact:
+              html += "<p><b>Play Store AAB:</b> <a href='" + aab_artifact + "'>Download AAB</a> (submit to Play Console)</p>"
+          html += "<hr><p><small>Game ID: " + game_id + "</small></p>"
+          msg = MIMEMultipart("alternative")
+          msg["Subject"] = "Game Build Ready: " + game_name
+          msg["From"] = "Quiz Game Builder <waqascsme@gmail.com>"
+          msg["To"] = user_email
+          msg.attach(MIMEText(html, "html"))
+          server = smtplib.SMTP("smtp.gmail.com", 587)
+          server.starttls()
+          server.login("waqascsme@gmail.com", gmail_pass)
+          server.sendmail("waqascsme@gmail.com", user_email, msg.as_string())
+          server.quit()
+          print("Email sent to " + user_email)
+          ENDSCRIPT
+
+      - name: Send email via Gmail SMTP
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GAME_NAME: ${{ github.event.inputs.game_name }}
+          USER_EMAIL: ${{ github.event.inputs.user_email }}
+          GAME_ID: ${{ github.event.inputs.game_id }}
+          ANDROID_KEY: ${{ needs.build-android.outputs.public_key }}
+          IOS_KEY: ${{ needs.build-ios.outputs.public_key }}
+          RUN_ID: ${{ github.run_id }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -z "$USER_EMAIL" ]; then
+            echo "No user email, skipping notification"
+            exit 0
+          fi
+          export ANDROID_URL="https://appetize.io/app/$ANDROID_KEY?autoplay=true"
+          export IOS_URL=""
+          export ANDROID_ARTIFACT_URL=""
+          export IOS_ARTIFACT_URL=""
+          if [ -n "$IOS_KEY" ]; then
+            export IOS_URL="https://appetize.io/app/$IOS_KEY?autoplay=true"
+          fi
+          export ANDROID_ARTIFACT_URL="https://github.com/$REPO/actions/runs/$RUN_ID/artifact/android-apk"
+          export IOS_ARTIFACT_URL="https://github.com/$REPO/actions/runs/$RUN_ID/artifact/ios-simulator"
+          export AAB_ARTIFACT_URL="https://github.com/$REPO/actions/runs/$RUN_ID/artifact/android-aab"
+          if [ -z "$GMAIL_APP_PASSWORD" ]; then
+            echo "No Gmail app password, skipping email"
+            echo "::notice::Android Preview: $ANDROID_URL"
+            echo "::notice::iOS Preview: $IOS_URL"
+            exit 0
+          fi
+          python3 /tmp/send_email.py
+
+      - name: Print preview links
+        if: always()
+        env:
+          ANDROID_KEY: ${{ needs.build-android.outputs.public_key }}
+          IOS_KEY: ${{ needs.build-ios.outputs.public_key }}
+        run: |
+          echo "=========================================="
+          echo "  GAME BUILD COMPLETE!"
+          echo "=========================================="
+          echo "Android: https://appetize.io/app/$ANDROID_KEY"
+          echo "iOS: https://appetize.io/app/$IOS_KEY"
+          echo "=========================================="
+          echo "::notice::Android Preview: https://appetize.io/app/$ANDROID_KEY"
+          echo "::notice::iOS Preview: https://appetize.io/app/$IOS_KEY"
